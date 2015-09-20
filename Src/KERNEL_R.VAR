@@ -1,0 +1,6 @@
+anc_ofs_retour  dw 0
+anc_seg_retour  dw 0
+sauv_SP         dw 0
+sauv_SS         dw 0
+anc70           db 0
+anc71           db 0

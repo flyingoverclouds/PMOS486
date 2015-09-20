@@ -1,0 +1,182 @@
+;***************************************************************
+;*                    KERNEL.DEF                               *
+;*                                                             *
+;*     contient les definitions des macros, structures, ...    *
+;*      utilisable dans 'kernel.asm' et autre 'kernel.xxx'     *
+;*                                                             *
+;*         ATTENTION : NECESSITE UN ASSEMBLAGE EN MODE         *
+;*                        286 PROTEGE                          *
+;*                                                             *
+;*             (c) Nicolas CLERC  <>  Mars 1993                *
+;***************************************************************
+
+
+;********************************************************************
+;*   Constante de type, droit d'acces de segment commun
+;*    a tous les types de segments
+
+pres_in_mem     equ 80h     ;bit de presence en memoire
+
+levelp_0        equ 00h     ;degre de protection 0 du segment
+levelp_1        equ 20h     ;                    1
+levelp_2        equ 40h     ;                    2
+levelp_3        equ 60h     ;                    3
+
+accessed        equ 01h     ;le segment a ete accede ( pr DATA et CODE seulement )
+comp386         equ 00h     ;const pour compatibilite 386
+
+data_desc       equ 10h     ;desc de segment de DATA
+code_desc       equ 18h     ;desc de segment de CODE
+syst_desc       equ 00h     ;desc de segment SYSTEM
+gate_desc       equ 04h     ;desc de GATE
+
+;----- constantes pour descripteur de segment de type DATA
+stack_seg       equ 04h     ;segment de type pile ( progression inverse )
+RW_seg          equ 02h     ;ecriture possible
+
+;----- constantes pour descripteur de segment de type CODE
+conf_seg        equ 04h     ;segment de code conforme ( la proc s'execute avec
+			; le privilege de l'appelant )
+R_seg           equ 02h     ;executable ET lisible par le programme
+
+;----- constantes pour descripteur de segment de type SYSTEM
+type1_seg       equ 01h     ;TSS d'1 tache non active
+type2_seg       equ 02h     ;Le segment concerne est 1 LDT !!!!!
+ldt_seg         equ type2_seg
+type3_seg       equ 03h     ;TSS d'1 tache active
+
+;----- constantes pour descripteur de GATE
+call_gate       equ 00h     ;pour appel a des procedures
+task_gate       equ 01h     ;pour un commutation de tache : avec changement
+			    ; de contexte
+int_gate        equ 02h     ;a placer ds IDT pour un deroutement sur
+			    ; un procedure d'interruption : pas de chgmt de
+			    ; contexte et CLI automatique
+trap_gate       equ 03h     ;idm int_gate MAIS PAS DE CLI automatique
+
+;---- constante pour les descripteur de TSS
+tss_busy        equ 01h
+
+
+;********************************************************************
+;*      PUSHALL : empilage de tout les registres
+
+pushall MACRO
+	pusha
+	pushf
+	ENDM
+
+
+;********************************************************************
+;*      POPALL : depilage de tous les registre empiler par PUSHALL
+
+popall  MACRO
+	popf
+	popa
+	ENDM
+
+;*******************************************************************
+;*      CALLFD : call far sur une adr SEL:OFS
+
+callf   MACRO sel,ofs
+	db 09ah
+	dw ofs
+	dw sel
+	ENDM
+
+;*******************************************************************
+;*      JMPFD : jump far sur une adr SEL:OFS
+
+jmpfd   macro sel,ofs
+	db 0eah
+	dw ofs
+	dw sel
+	ENDM
+
+;*******************************************************************
+;*      CALLTSS : call sur une task gate
+
+calltss MACRO seltss
+	db 09ah
+	dw 0
+	dw seltss
+	ENDM
+
+;*******************************************************************
+;*      JMPTSS : jump sur une task gate
+
+jmptss  macro seltss
+	db 0eah
+	dw 0
+	dw seltss
+	ENDM
+
+;******************************************************************
+;*      DESC_SEG_S : structure de description d'1 segment
+;*      la base est en adresse PHYSIQUE : SUR 24 bits !!!!!!
+
+desc_seg_s	STRUCT
+		seg_limite      dw 0    ;taille du seg en octet
+		seg_base_lo     dw 0    ;16 bits de pd faible de la base
+		seg_base_hi     db 0    ;8 bits de pd fort de la base
+		seg_acces       db 0    ;type des desc, droit,...
+		reserve         dw 0    ;POUR COMPATIBILITE i80386
+desc_seg_s      ENDS
+
+;******************************************************************
+;*      DESC_GATE_S : structure de description d'une gate 
+;*                      en gdt ou idt
+desc_gate_s	STRUCT
+		gate_offset     dw 0    ;offset du point d'entr‚e de la proc
+		gate_selector   dw 0    ;selecteur de segment de code
+		gate_nbword     db 0    ;nb de mot copi‚ de la pile de l'appelant
+		gate_acces      db 0    ;type de desc, droit, ...     
+desc_gate_s     ENDS                
+
+
+
+;******************************************************************
+;*      DESC_INT_S : structure de description d'1 segment
+;*      la base est en adresse PHYSIQUE : SUR 24 bits !!!!!!
+
+desc_int_s      STRUC
+		int_offset      dw 0    ;offset de decalage pt d'entree
+		int_selecteur   dw 0    ;selecteur de seg pour la IDT
+		reserve1        db 0    ;inutile
+		int_acces       db 0    ;type de desc, droit,...
+		reserve2        dw 0    ;pour compatibilite i80386
+desc_int_s      ENDS
+
+
+;*******************************************************************
+;*      TSS_S : structure d'un TSS
+;*      minimum 22 mots !
+
+
+tss_s   STRUC
+	tss_back_link   dw 0
+	tss_sp0         dw 0
+	tss_ss0         dw 0
+	tss_sp1         dw 0
+	tss_ss1         dw 0
+	tss_sp2         dw 0
+	tss_ss2         dw 0
+	tss_ip          dw 0
+	tss_flag        dw 0
+	tss_ax          dw 0
+	tss_cx          dw 0
+	tss_dx          dw 0
+	tss_bx          dw 0
+	tss_sp          dw 0
+	tss_bp          dw 0
+	tss_si          dw 0
+	tss_di          dw 0
+	tss_es          dw 0
+	tss_cs          dw 0
+	tss_ss          dw 0
+	tss_ds          dw 0
+	tss_reserv      dw 20 dup (0); reservation de 20 mots pr usage ulterieur
+tss_s   ENDS
+
+
+;***************************************************** FIN 'KERNEL.DEF'

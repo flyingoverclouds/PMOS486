@@ -1,0 +1,23 @@
+;***************************************************************
+;*                   KERNEL_P.VAR                              *
+;*                                                             *
+;*      contient les definitions des variables utilisable      *
+;*          dans le kernel mais pour le mode prot‚g‚           *
+;*                                                             *
+;*         ATTENTION : NECESSITE UN ASSEMBLAGE EN MODE         *
+;*                        286 PROTEGE                          *
+;*                                                             *
+;*             (c) Nicolas CLERC  <>  Mars 1993                *
+;***************************************************************
+
+
+screen_col      db 0    ; colonne courante du curseur
+screen_line     db 0    ; ligne courante du curseur
+screen_ofs      dw 3200    ; offset courant du curseur
+screen_coul     db 2    ; attribut courant de l'affichage
+
+coul_l1         db 0    ; couleur de la ligne 1 de l'‚cran
+
+
+;***************************************************** FIN 'KERNEL_P.VAR'
+

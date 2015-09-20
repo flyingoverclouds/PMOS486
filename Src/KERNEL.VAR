@@ -1,0 +1,45 @@
+;***************************************************************
+;*                    KERNEL.VAR                               *
+;*                                                             *
+;*           contient les definitions des variables            *
+;*      utilisable dans 'kernel.asm' et autre 'kernel.xxx'     *
+;*                                                             *
+;*         ATTENTION : NECESSITE UN ASSEMBLAGE EN MODE         *
+;*                        286 PROTEGE                          *
+;*                                                             *
+;*             (c) Nicolas CLERC  <>  Mars 1993                *
+;***************************************************************
+
+
+
+anc_ofs_retour  dw 0
+anc_seg_retour  dw 0
+sauv_SP         dw 0
+sauv_SS         dw 0
+anc70           db 0
+anc71           db 0
+
+off_mode_prot   dw 0
+select_code     dw 0
+
+
+oldidt          dw 0
+                dw 0
+                dw 0
+                dw 0
+
+; variable utilise pour la detection de processeur : (c) Intel Corp.
+intel_id        db "GenuineIntel"
+fp_status       dw      ?
+vendor_id       db      12 dup (?)
+cpu_type        db      ?
+model           db      ?
+stepping        db      ?
+id_flag         db      0
+fpu_type        db      0
+intel_proc      db      0
+feature_flags   dw      2 dup (0)
+
+
+;***************************************************** FIN 'KERNEL.VAR'
+
