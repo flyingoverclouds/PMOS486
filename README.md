@@ -1,5 +1,5 @@
 # PMOS486
-a basic operating system bootstrapper for x86 Protected Mode bootstrapper 
+a basic operating system bootstrapper for Intel x86 Protected Mode  
 
 A raw 'operating system' bootstraper created before (and updated while) my university cursus (start of 90s). The goal was to understand and implement a switch from Intel i80286 Real Mode (MSDOS environment) to Protected mode (modern OS process isolation), the very first steps of a modern OS boot.
 
