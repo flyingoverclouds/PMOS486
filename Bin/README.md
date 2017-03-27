@@ -1,4 +1,4 @@
-# PMOS486 - Dos Build
+# PMOS486 - MSDos Build
 The *pro486.exe* is a legacy build of the PMOS. 
 It is provide "as is" without any warranties. 
 
